@@ -2,8 +2,10 @@
 ## 树的基本概念
 - 一个根节点，若干子树
 - 每个结点分裂出的个数为度
-- 最深的层代表树的深度
-![树的度](./pics/tree/树的度.png "度")
+- 最深的层代表树的深度 
+
+![树的度](./pics/tree/树的度.png "度")  
+
 ![树的深度](./pics/tree/树的深度.png "深度")
 ## 树的种类
 ### 1. 二叉树
@@ -21,11 +23,13 @@
 #### 2.1 满二叉树特点
 - 叶子在最下层
 - 非叶子结点的度为2
-- 同样深度的二叉树中，满二叉树的结点个数最多，叶子结点最多
+- 同样深度的二叉树中，满二叉树的结点个数最多，叶子结点最多  
+
 ![满二叉树](./pics/tree/满二叉树.png)
 ### 3. 完全二叉树
 #### 3.1 概念
-- 对一颗具有n个结点的二叉树按层编号，如果编号为i(1<=i<=n)的结点与同样深度的满二叉树中编号为i的结点在二叉树中位置完全相同，则这棵二叉树称为完全二叉树。
+- 对一颗具有n个结点的二叉树按层编号，如果编号为i(1<=i<=n)的结点与同样深度的满二叉树中编号为i的结点在二叉树中位置完全相同，则这棵二叉树称为完全二叉树。  
+
 ![完全二叉树](./pics/tree/完全二叉树.png)
 #### 3.2 特点
 - 叶子结点只出现在最下层和次下层
@@ -146,7 +150,8 @@ class Solution {
 ###### 迭代：
 - 迭代的方法一般是显式的维护一个栈
 
-前序：
+前序：  
+
 ![前序遍历](./pics/tree/前序遍历.png "前序遍历")
 
 - 初始化栈，将根节点入栈
@@ -181,7 +186,8 @@ class Solution {
     }
 }
 ```
-中序：
+中序：  
+
 ![中序遍历](./pics/tree/中序遍历.png "中序遍历")
 
 - 按照 左——>中——>右的顺序输出结点
@@ -244,10 +250,14 @@ class Solution {
 ```
 ### 二. 二叉树的层序遍历（广度优先搜索）
 遍历方法：
-**DFS vs BFS**
-![搜索方式](./pics/tree/dfs.gif)
-BFS通常用来求层序遍历和最短路径
-![层序遍历](./pics/tree/层序遍历.png "层序遍历")
+**DFS vs BFS**  
+
+![搜索方式](./pics/tree/dfs.gif)  
+
+BFS通常用来求层序遍历和最短路径  
+
+![层序遍历](./pics/tree/层序遍历.png "层序遍历")  
+
 层序遍历用队列
 - 先入队根节点，如果左子树为空，入队左子树，如果右子树为空入队右子树
 ```
@@ -382,7 +392,8 @@ class Solution {
 ```
 - [计算每一层的最大值 leetcode515](https://leetcode-cn.com/problems/find-largest-value-in-each-tree-row/)
 - [计算每一层的平均值 leetcode637](https://leetcode-cn.com/problems/average-of-levels-in-binary-tree/)
-- *队列相关补充*  
+- *队列相关补充*   
+
 ![队列层级](./pics/tree/双端队列.png "双端队列")
 ```
 Queue queue = new LinkedList();//普通队列
@@ -392,7 +403,8 @@ Deque<Integer> queue = new ArrayList<>();
 ```
 最短路径相关题目
 
-- 图按照每一层遍历，处理无权重最短路问题
+- 图按照每一层遍历，处理无权重最短路问题  
+
 ![最短路问题](./pics/tree/最短路.JPG)
 
 - [离开陆地的最远距离 leetcode1162](https://leetcode-cn.com/problems/as-far-from-land-as-possible/)
@@ -446,7 +458,8 @@ public int maxDepth(TreeNode root) {
     }
 ```  
 - [二叉树直径leetcode543](https://leetcode-cn.com/problems/diameter-of-binary-tree/)&&[递归视频讲解](https://leetcode-cn.com/problems/diameter-of-binary-tree/solution/er-cha-shu-de-zhi-jing-by-leetcode-solution/)  
-  1. 树的直径指任意两个结点之间路径的最大值，并不一定通过根节点
+  1. 树的直径指任意两个结点之间路径的最大值，并不一定通过根节点  
+
 ![树的直径](./pics/tree/树的直径.jpg)  
   1. **树的直径 == 该链路的结点个数 - 1 == 左子树深度+右子树深度**   
   2. 结点个数 = 该结点左子树深度（4->9） + 该结点右子树深度(5->7->8)  
@@ -654,7 +667,7 @@ class Solution {
 }
 ```
 - [验证二叉搜索树leetcode98](https://leetcode-cn.com/problems/validate-binary-search-tree/)  
-    1. 二叉搜索树定义：节点的左子树只包含小于当前节点的数，节点的右子树只包含大于当前节点的数。
+    1. 二叉搜索树(Binary search tree,简称BST)定义：节点的左子树只包含小于当前节点的数，节点的右子树只包含大于当前节点的数。
     2. 所有的左子树和右子树都是二叉搜索树。
     3. ***二叉搜索树的中序遍历是递增的。***  
    
@@ -701,6 +714,7 @@ class Solution {
         return true;
     }
     */
+    // 中序遍历一遍，保证当前结点必定小于之前的结点
     long pre = Long.MIN_VALUE;
     public boolean isValidBST(TreeNode root) {
         if (root == null) {
@@ -713,6 +727,91 @@ class Solution {
         pre = root.val;
         boolean r = isValidBST(root.right);
         return l && r;
+    }
+}
+```
+- 二叉搜索树的增删改查
+- BST遍历框架
+```
+void BST(TreeNode root, int target) {
+    if (root.val == target)
+        // 找到目标，做点什么
+    if (root.val < target) 
+        BST(root.right, target);
+    if (root.val > target)
+        BST(root.left, target);
+}
+```
+- 查
+```
+public TreeNode searchBST(TreeNode root, int target){
+    if (root == null) {
+        return null;
+    }
+    if (root.val > target) {
+        return searchBST(root.left, target);
+    }
+    if (root.val < target) {
+        return searchBST(root.right, target);
+    }
+    return root;
+}
+```
+- 增
+```
+class Solution {
+    public TreeNode insertIntoBST(TreeNode root, int val) {
+        if (root == null) {
+            return new TreeNode(val);
+        }
+        if (root.val > val) {
+            root.left = insertIntoBST(root.left,val);
+        }
+        if (root.val < val) {
+            root.right = insertIntoBST(root.right,val);
+        }
+        return root;
+    }
+}
+```
+- 改
+```
+class Solution {
+    public TreeNode deleteNode(TreeNode root, int key) {
+        if (root == null) {
+            return null;
+        } 
+        if (root.val == key) {
+            // 删除操作
+            // 1. 叶子结点，删除就为空
+            if (root.left == null && root.right == null) {
+                return null;
+            }
+            // 2. 删除当前结点，需要子节点去补，如果有一边是空，则肯定另一边去补
+            if (root.left == null) {
+                return root.right;
+            }
+            if (root.right == null) {
+                return root.left;
+            }
+            // 有左右子树，则找到左边最大的或者右边最小的来代替
+            if (root.left != null && root.right != null) {
+                TreeNode rightMin = getRightMin(root.right);
+                root.val = rightMin.val;
+                root.right = deleteNode(root.right, rightMin.val);
+            }
+        } else if (root.val > key) {
+            root.left = deleteNode(root.left, key);
+        } else if (root.val < key) {
+            root.right = deleteNode(root.right, key);
+        }
+        return root;
+    }
+    public TreeNode getRightMin(TreeNode node) {
+        while (node.left != null) {
+            node = node.left;
+        }
+        return node;
     }
 }
 ```
@@ -890,12 +989,42 @@ class Solution {
     }
 }
 ```
+- [BST转化成累加树leetcode538](https://leetcode-cn.com/problems/convert-bst-to-greater-tree/solution/)  
+  
+![累加树](./pics/tree/累加树.png)
+|  0 | 1  | 2 | 3 | 4 | 5 | 6 | 7 | 8 |  
+| ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ----|  
+| 36  | 36  | 35 | 33 | 30 | 26 | 21 | 15 | 8 |   
+
+1. 每一个数的值等于前一个数的值+当前索引
+2. 如果降序排列。先遍历8，然后7，然后6。则每个值就是前一和+当前索引。
+```
+class Solution {
+    public TreeNode convertBST(TreeNode root) {
+        traverse(root);
+        return root;
+    }
+    int ans = 0;
+    public void traverse(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        // 中序遍历
+        traverse(root.right);
+        root.val = ans + root.val;
+        ans = root.val;
+
+        traverse(root.left);
+    }
+}
+```
 - [前序遍历和中序遍历构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)  
     1. 逆向操作，知道遍历，反推二叉树
     2. 前序总是【【根节点, 【左子树的前序遍历结果】, 【右子树的前序遍历结果】】
     3. 中序总是【【左子树中序遍历结果】，根节点，【右子树的中序遍历结果】】
     4. 前序遍历的第一个值必定是根节点，中序遍历中根节点左右两边分别是左子树和右子树，因此每次划分前序遍历就可以得到树
-    5. 其实就是找到前序遍历的左右边界，然后递归
+    5. 其实就是找到前序遍历的左右边界，然后递归  
+
     ![前中序到树](./pics/tree/前中序到树.png)
 ```
 class Solution {
@@ -996,7 +1125,7 @@ class Solution {
 
 }
 ```
-- [BST转化成累加树leetcode538]()
+
 
 
 
