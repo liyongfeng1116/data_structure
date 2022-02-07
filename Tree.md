@@ -173,7 +173,7 @@ class Solution {
         stack.push(root);   // 先加入进去
 
         while (!stack.isEmpty()) {
-            TreeNode node = stack.pop();
+            TreeNode node = stack.pop(); // 立马pop()
             res.add(node.val);
             if (node.right != null) {
                 stack.push(node.right);
@@ -206,7 +206,7 @@ class Solution {
         TreeNode curr = root;
         while (!stack.isEmpty() || curr != null) {
             while (curr != null) {
-                stack.push(curr);
+                stack.push(curr);  // 一直push到左子树为空为止
                 curr = curr.left;
             }
             TreeNode node = stack.pop();
@@ -234,7 +234,7 @@ class Solution {
         while (!stack1.isEmpty()) {
             TreeNode node = stack1.pop();
             stack2.push(node.val);
-            if (node.left != null) {
+            if (node.left != null) {  // 不同于先序，先左后右
                 stack1.push(node.left);
             }
             if (node.right != null) {
@@ -341,7 +341,7 @@ class Solution {
             for (int i = 0; i < n; i++) {
                 TreeNode node = queue.poll();
                 if (flag) {
-                     level.addLast(node.val);
+                    level.addLast(node.val);
                 } else {
                     level.addFirst(node.val);
                 }
@@ -569,6 +569,7 @@ class Solution {
 - [翻转二叉树leetcode226](https://leetcode-cn.com/problems/invert-binary-tree/)
     1. 终止条件，当前结点为空
     2. 交换当前结点的左右结点，递归交换当前结点的左节点，递归交换当前结点的右节点
+    3. 后序遍历，因为当前交换基于已经交换的基础上
 ```
 class Solution {
     /*
