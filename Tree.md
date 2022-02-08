@@ -971,7 +971,7 @@ class Solution {
         TreeNode res = construct(nums, 0, n-1);
         return res;
     }
-    public TreeNode construct(int[] nums, int left, int right) {
+    public TreeNode construct(int[] nums, int left, int right) {\
         if (right < left) {
             return null;
         }
