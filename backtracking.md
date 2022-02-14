@@ -13,6 +13,7 @@
 
 ## 组合问题
 - [组合leetcode77](https://leetcode-cn.com/problems/combinations/)
+![组合1](./pics/backtracking/组合1.png)
 ```
 class Solution {
     List<List<Integer>> res = new ArrayList<>();
@@ -38,6 +39,7 @@ class Solution {
 }
 ```
 - [组合总和leetcode216](https://leetcode-cn.com/problems/combination-sum-iii/)
+- ![组合1](./pics/backtracking/组合2.png)
 ```
 class Solution {
     List<List<Integer>> res = new ArrayList<>();
@@ -65,6 +67,7 @@ class Solution {
 }
 ```
 - [电话号码的字母组合leetcode17](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/)
+![电话号码](./pics/backtracking/电话号码.png)
 ```
 class Solution {
     List<String> res = new ArrayList<>();
@@ -93,6 +96,7 @@ class Solution {
 }
 ```
 - [组合总和leetcode39](https://leetcode-cn.com/problems/combination-sum/)
+![组合3](./pics/backtracking/组合3.png)
 ```
 class Solution {
     List<List<Integer>> res = new ArrayList<>();
@@ -123,6 +127,7 @@ class Solution {
 }
 ```
 - [组合问题2](https://leetcode-cn.com/problems/combination-sum-ii/)
+![组合3](./pics/backtracking/组合4.png)
 ```
 class Solution {
     List<List<Integer>> res = new ArrayList<>();
@@ -162,3 +167,166 @@ class Solution {
 }
 ```
 - [分割回文串leetcode131](https://leetcode-cn.com/problems/palindrome-partitioning/)
+![回文](./pics/backtracking/回文.jfif)
+1. 切割问题
+2. 回文串问题
+```
+class Solution {
+    List<List<String>> res = new ArrayList<>();
+    LinkedList<String> path = new LinkedList<>();
+
+    void backtracking (String s, int startIndex) {
+        // 起始位置大于s的大小，说明找到一组分割
+        if (startIndex >= s.length()) {
+            res.add(new ArrayList(path));
+            return;  
+        }
+
+        for (int i = startIndex; i < s.length(); i++) {
+            if (isPalindrome(s, startIndex,i)) {
+                String str = s.substring(startIndex, i + 1);
+                path.add(str);
+            } else {
+                continue;
+            }
+            // 起始位置后移保证不重复
+            backtracking(s, i + 1);
+            path.removeLast();
+        }
+    }
+    // 判断是否是回文串，p代表起始，q代表终点
+    public boolean isPalindrome (String s, int p, int q) {
+        while (p < q) {
+            if (s.charAt(p) == s.charAt(q)) {
+                p++;
+                q--;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public List<List<String>> partition(String s) {
+        backtracking(s, 0);
+        return res;
+    }
+}
+```
+- [复原IP地址leetcode93](https://leetcode-cn.com/problems/restore-ip-addresses/)
+![复原IP地址](./pics/backtracking/ip地址.png)
+1. IP地址一定被分为4段
+2. 每一段不能超过255
+```
+class Solution {
+    List<String> res = new ArrayList<>();
+
+    void backtracking(String s, int startIndex, int pointNum) {
+        // 被分为4段，每段合法即可，因此分割数为3 && 最后一位不能超过255
+        if (pointNum == 3) {
+            if (isValid(s, startIndex, s.length()-1)) {
+                res.add(s);
+            }
+            return;
+        }
+
+        for (int i = startIndex; i < s.length(); i++) {
+            if (isValid(s, startIndex, i)) {
+                s = s.substring(0, i+1) + "." + s.substring(i+1);
+                pointNum++;
+                backtracking(s, i+2, pointNum);
+                pointNum--;
+                s = s.substring(0, i+1) + s.substring(i+2);
+            } else {
+                break;
+            }
+        }
+    }
+    // 验证数字是否合法，初始位不等于0，且不能超过255
+    public boolean isValid (String s, int start, int end) {
+        if (start > end) {
+            return false;
+        }
+        if (s.charAt(start) == '0' && start != end) { // 0开头的数字不合法
+            return false;
+        }
+        int num = 0;
+        for (int i = start; i <= end; i++) {
+            if (s.charAt(i) > '9' || s.charAt(i) < '0') { // 遇到⾮数字字符不合法
+                return false;
+            }
+            num = num * 10 + (s.charAt(i) - '0');
+            if (num > 255) { // 如果⼤于255了不合法
+                return false;
+            }
+        }
+        return true;
+    }
+    public List<String> restoreIpAddresses(String s) {
+        if (s.length() > 12) return res; // 算是剪枝了
+        backtracking(s, 0, 0);
+        return res;
+    }
+}
+```
+- [子集1 leetcode](https://leetcode-cn.com/problems/subsets/)
+1. 不需要返回值
+![子集1](./pics/backtracking/子集1.png)
+```
+class Solution {
+    List<List<Integer>> res = new ArrayList<>();
+    LinkedList<Integer> path = new LinkedList<>();
+
+    void backtracking (int[] nums, int index) {
+        res.add(new ArrayList<>(path));
+
+        for(int i = index; i < nums.length; i++) {
+            path.add(nums[i]);
+            backtracking(nums, i + 1);
+            path.removeLast();
+        }    
+    }
+
+    public List<List<Integer>> subsets(int[] nums) {
+        if (nums.length == 0) {
+            res.add(new ArrayList<>());
+        }
+        backtracking(nums, 0);
+        return res;
+    }
+}
+```
+- [子集2 leetcode90](https://leetcode-cn.com/problems/subsets-ii/)
+1. 要去重元素必须先排序
+
+![子集2](./pics/backtracking/子集2.png)
+```
+class Solution {
+    List<List<Integer>> res = new ArrayList<>();
+    LinkedList<Integer> path = new LinkedList<>();
+
+    void backtracking (int[] nums, int index, boolean[] used) {
+        res.add(new ArrayList<>(path));
+        if (index > nums.length) {
+            return;
+        }
+
+        for (int i = index; i < nums.length; i++) {
+            if (i > 0 && nums[i] == nums[i-1] && used[i-1] == false) {
+                continue;
+            }
+            used[i] = true;
+            path.add(nums[i]);
+            backtracking(nums, i+1, used);
+            used[i] = false;
+            path.removeLast();
+        }
+    }
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+        Arrays.sort(nums);
+        boolean [] flag = new boolean[nums.length];
+        backtracking(nums, 0, flag);
+        return res;
+    }
+}
+```
