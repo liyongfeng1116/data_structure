@@ -392,4 +392,75 @@ class Solution {
     }
 }
 ```
-- [无重叠区间leetcode763](https://leetcode-cn.com/problems/partition-labels/)
+- [划分字母区间leetcode763](https://leetcode-cn.com/problems/partition-labels/)
+```
+class Solution {
+    public List<Integer> partitionLabels(String s) {
+        int[] edge = new int[26];
+        char[] chars = s.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            edge[chars[i] - 'a'] = i;
+        }
+
+        List<Integer> res = new LinkedList<>();
+        int last = -1;
+        int idx = 0;
+        for (int i = 0; i < chars.length; i++) {
+            idx = Math.max(idx,edge[chars[i] - 'a']);
+            if (i == idx) {
+                res.add(i - last);
+                last = i;
+            }
+        }
+        return res;
+    }
+}
+```
+- [合并区间leetcode56](https://leetcode-cn.com/problems/merge-intervals/)
+```
+class Solution {
+    public int[][] merge(int[][] intervals) {
+        Arrays.sort(intervals, (a,b) -> Integer.compare(a[0],b[0]));
+        int start = intervals[0][0];
+        List<int[]> res = new LinkedList<>();
+
+        for (int i = 1; i < intervals.length; i++) {
+            if (intervals[i-1][1] < intervals[i][0]) {
+                // 前一个右边界 < 当前左边界。需要断开，下一次开始为当前的左边界
+                res.add(new int[]{start,intervals[i-1][1]});
+                start = intervals[i][0];
+            } else {
+                // 重叠，右边边界取最大的
+                intervals[i][1] = Math.max(intervals[i-1][1], intervals[i][1]);
+            }
+        }
+        res.add(new int[]{start,intervals[intervals.length-1][1]});
+        return res.toArray(new int[res.size()][]);
+    }
+}
+```
+- [单调递增的数字leetcode738](https://leetcode-cn.com/problems/monotone-increasing-digits/)
+    1. 98，一旦出现strNum[i - 1] > strNum[i]的情况（非单调递增），首先想让strNum[i - 1]--，然后strNum[i]给为9，这样这个整数就是89，即小于98的最大的单调递增整数。
+    2. 局部最优：遇到strNum[i - 1] > strNum[i]的情况，让strNum[i - 1]--，然后strNum[i]给为9，可以保证这两位变成最大单调递增整数。
+    3. 全局最优：得到小于等于N的最大单调递增的整数。
+    4. 但这里局部最优推出全局最优，还需要其他条件，即遍历顺序，和标记从哪一位开始统一改成9。
+```
+class Solution {
+    public int monotoneIncreasingDigits(int n) {
+        // 数字转字符串列表
+        String[] strings = (n+"").split("");
+        int start = strings.length;
+        for (int i = strings.length - 1; i > 0; i--) {
+            if (Integer.parseInt(strings[i]) < Integer.parseInt(strings[i-1])) {
+                strings[i - 1] = (Integer.parseInt(strings[i - 1]) - 1) + "";
+                start = i;
+            }
+        }
+        for (int i = start; i < strings.length; i++) {
+            strings[i] = "9";
+        }
+        // 字符串转数字
+        return Integer.parseInt(String.join("",strings));
+    }
+}
+```
