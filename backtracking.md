@@ -298,6 +298,7 @@ class Solution {
 ```
 - [子集2 leetcode90](https://leetcode-cn.com/problems/subsets-ii/)
 1. 要去重元素必须先排序
+2. 去重需要使用的判断条件
 
 ![子集2](./pics/backtracking/子集2.png)
 ```
@@ -312,7 +313,7 @@ class Solution {
         }
 
         for (int i = index; i < nums.length; i++) {
-            if (i > 0 && nums[i] == nums[i-1] && used[i-1] == false) {
+            if (i > 0 && nums[i] == nums[i-1] && used[i-1] == false) { // 去重的判断条件
                 continue;
             }
             used[i] = true;
@@ -326,6 +327,121 @@ class Solution {
         Arrays.sort(nums);
         boolean [] flag = new boolean[nums.length];
         backtracking(nums, 0, flag);
+        return res;
+    }
+}
+```
+- [递增子序列leetcode491](https://leetcode-cn.com/problems/increasing-subsequences/)
+1. 去重
+![递增子序列](./pics/backtracking/递增子序列.png)
+```
+class Solution {
+    List<List<Integer>> res = new ArrayList<>();
+    LinkedList<Integer> path = new LinkedList<>();
+
+    void backtracking (int[] nums, int startIndex) {
+        // LinkedList 用size()
+        if (path.size() > 1) {
+            res.add(new ArrayList<>(path));
+            // return; // 此处不需要返回，要不然一到2就返回
+        }
+        int[] used = new int[201]; // 因为nums[i] = (-100 ~ 100) 之间
+        for (int i = startIndex; i < nums.length; i++) {
+            // nums[i] 代表取的那个数，不能跟已经取的数重复。且不能小于path的末尾的元素
+            if (!path.isEmpty() && nums[i] < path.getLast() || (used[nums[i] + 100] == 1)) {
+                continue;
+            }
+            // used+100后就是独一无二的值
+            used[nums[i] + 100] = 1;
+            path.add(nums[i]);
+            backtracking(nums, i + 1);
+            path.removeLast();
+        }
+    }
+    public List<List<Integer>> findSubsequences(int[] nums) {
+        backtracking(nums, 0);
+        return res;
+    }
+}
+```
+- [全排列leetcode46](https://leetcode-cn.com/problems/permutations/)
+1. 全排列跟顺序有关
+```
+class Solution {
+    List<List<Integer>> res = new ArrayList<>();
+    LinkedList<Integer> path = new LinkedList<>();
+
+    void backtracking (int[] nums, boolean[] used) {
+        if (path.size() == nums.length) {
+            res.add(new ArrayList<>(path));
+            return;
+        }
+
+        for (int i = 0; i < nums.length; i++) {
+            if (used[i]) {
+                continue;
+            }
+            path.add(nums[i]);
+            used[i] = true;
+            backtracking(nums, used);
+            used[i] = false;
+            path.removeLast();
+        }
+    }
+    public List<List<Integer>> permute(int[] nums) {
+        boolean[] flag = new boolean[nums.length]; 
+        backtracking(nums, flag);
+        return res;
+    }
+}
+```
+- [全排列去重leetcode47](https://leetcode-cn.com/problems/permutations-ii/)
+
+1. 去重关键代码(对于排列问题，树层上去重和树枝上去重都可以)
+![树层去重](./pics/backtracking/树层去重.png)
+```
+// 树层去重
+if (i > 0 && nums[i] == nums[i - 1] && used[i - 1] == false) {
+    continue;
+}
+```
+![树枝去重](./pics/backtracking/树枝去重.png)
+```
+// 树枝去重
+if (i > 0 && nums[i] == nums[i - 1] && used[i - 1] == true) {
+    continue;
+}
+```
+
+```
+class Solution {
+    List<List<Integer>> res = new ArrayList<>();
+    LinkedList<Integer> path = new LinkedList<>();
+
+    void backtracking (int[] nums, boolean[] used) {
+        if (path.size() == nums.length) {
+            res.add(new ArrayList<>(path));
+            return;
+        }
+
+        for (int i = 0; i < nums.length; i++) {
+
+            if (i > 0 && nums[i] == nums[i-1] && used[i - 1] == false) {
+                continue;
+            }
+            if (used[i] == false) {
+                used[i] = true;
+                path.add(nums[i]);
+                backtracking(nums, used);
+                path.removeLast();
+                used[i] = false;
+            }
+        }
+    }
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        Arrays.sort(nums);
+        boolean[] flag = new boolean [nums.length];
+        backtracking(nums, flag);
         return res;
     }
 }
