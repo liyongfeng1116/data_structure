@@ -9,7 +9,26 @@
 ![题目大纲](./pics/backtracking/题目大纲.png)
 1. 回溯算法的问题可以抽象为树形问题——>递归在集合中查找子集，集合的大小构成了树的宽度，递归的深度构成树的深度。
 2. (1)递归函数的返回值及参数 （2）回溯函数终止条件 （3）回溯搜索的遍历过程  
+ 
 ![回溯搜索示意图](./pics/backtracking/回溯搜索示意图.png)
+```
+回溯问题伪代码
+class Solution {
+    res = [];
+    path = [];
+    // 部分需要先排序
+    backtracking (参数) {
+        终止条件（纵向返回值），一般为到哪一层
+        达到条件添加path到res
+
+        for () { // for循环横向遍历，注意i从什么时候开始,每次不变，就是可重复取
+        1.添加一个元素到path
+        2.递归，控制纵向，参数更新
+        3.回溯，撤销本次处理的结点
+        }
+    }
+}
+```
 
 ## 组合问题
 - [组合leetcode77](https://leetcode-cn.com/problems/combinations/)
@@ -26,7 +45,7 @@ class Solution {
         }
         // 横向遍历
         for (int i = startIndex; i <= n; i++) { // 控制横向遍历 
-            path.add(i); // 处理结点
+            path.add(i); // 处理结点,每次取数
             // 纵向递归
             backtracking(n, k, i+1); // 控制树的纵向遍历，注意下一层搜索要从i+1开始
             path.removeLast(); // 撤销本次处理的结点
@@ -66,7 +85,8 @@ class Solution {
     }
 }
 ```
-- [电话号码的字母组合leetcode17](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/)
+- [电话号码的字母组合leetcode17](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/)  
+
 ![电话号码](./pics/backtracking/电话号码.png)
 ```
 class Solution {
@@ -96,6 +116,8 @@ class Solution {
 }
 ```
 - [组合总和leetcode39](https://leetcode-cn.com/problems/combination-sum/)
+1. 可重复取数
+
 ![组合3](./pics/backtracking/组合3.png)
 ```
 class Solution {
@@ -126,7 +148,11 @@ class Solution {
     }
 }
 ```
-- [组合问题2](https://leetcode-cn.com/problems/combination-sum-ii/)
+- [组合问题2](https://leetcode-cn.com/problems/combination-sum-ii/)  
+1. 因为有很多可能重复的数字
+2. 每个数字在每个组合中只能出现一次
+3. 先排序，然后利用辅助数组判断是否已经重复
+
 ![组合3](./pics/backtracking/组合4.png)
 ```
 class Solution {
@@ -166,10 +192,11 @@ class Solution {
     }
 }
 ```
-- [分割回文串leetcode131](https://leetcode-cn.com/problems/palindrome-partitioning/)
+- [分割回文串leetcode131](https://leetcode-cn.com/problems/palindrome-partitioning/)  
+
 ![回文](./pics/backtracking/回文.jfif)
-1. 切割问题
-2. 回文串问题
+1. 切割问题 string.substring(i, j)
+2. 回文串问题 （双指针）
 ```
 class Solution {
     List<List<String>> res = new ArrayList<>();
@@ -213,7 +240,8 @@ class Solution {
     }
 }
 ```
-- [复原IP地址leetcode93](https://leetcode-cn.com/problems/restore-ip-addresses/)
+- [复原IP地址leetcode93](https://leetcode-cn.com/problems/restore-ip-addresses/)  
+
 ![复原IP地址](./pics/backtracking/ip地址.png)
 1. IP地址一定被分为4段
 2. 每一段不能超过255
@@ -269,8 +297,9 @@ class Solution {
     }
 }
 ```
-- [子集1 leetcode](https://leetcode-cn.com/problems/subsets/)
-1. 不需要返回值
+- [子集1 leetcode](https://leetcode-cn.com/problems/subsets/) 
+1. 不需要返回值  
+
 ![子集1](./pics/backtracking/子集1.png)
 ```
 class Solution {
