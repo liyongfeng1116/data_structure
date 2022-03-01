@@ -35,3 +35,12 @@
 ## 在idea中配置tomcat
 ![tomcat](./pics/maven/tomcat.png)
 ## pom.xml文件
+<dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  用来导入包
