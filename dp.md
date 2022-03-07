@@ -591,5 +591,378 @@ return dp[n];
 3. 递推公式为，如果dp[j] == true,且[j,i]区间的字串在字典里，那dp[i]一定为true
 4. 初始化 dp[0] = true;
 5. 遍历方向：排列组合都可以
+```
+class Solution {
+    public boolean wordBreak(String s, List<String> wordDict) {
+        boolean[] dp = new boolean[s.length() + 1];
+        dp[0] = true;
+        for (int i = 1; i <= s.length(); i++) {  // 遍历背包
+            for (int j = 0; j < i; j++) { // 遍历背包里的物品 字符串（j,i）
+                if (wordDict.contains(s.substring(j,i)) && dp[j]) {
+                    dp[i] = true;
+                }
+            }
+        }
+        return dp[s.length()];
+    }
+}
+```
+```
+// 回溯版
+ public boolean backtrack(String s, Set<String> wordDictSet, int startIndex, int[] memory) {
+        // 递归终止条件
+        if (startIndex >= s.length()) {
+            return true;
+        }
 
+        if (memory[startIndex] != 0) {
+            return memory[startIndex] == 1 ? true : false;
+        }
 
+        // 横向遍历
+        for (int i = startIndex; i < s.length(); i++) {
+            String word = s.substring(startIndex, i + 1);
+            if (wordDictSet.contains(word) && backtrack(s, wordDictSet, i+1, memory)) {
+                memory[startIndex] = 1;
+                return true;
+            }
+        }
+        memory[startIndex] = -1;
+        return false;
+    }
+
+    public boolean wordBreak(String s, List<String> wordDict) {
+        int[] memory = new int[s.length()];
+        Set<String> wordDictSet = new HashSet<>(wordDict);
+        return backtrack(s, wordDictSet, 0, memory);
+    }
+```
+### 打家劫舍
+[打家劫舍leetcode198](https://leetcode-cn.com/problems/house-robber/)
+#### 思路
+1. dp[i] 表示偷i家以内的房屋，最大收益为dp[i]
+2. 明显dp[i] 与dp[i-2] + nums[i]和dp[i-1]相关，因此 dp[i] = Math.max(dp[i-2] + nums[i],dp[i-1])
+3. 初始化：dp[0] = nums[0]; dp[1] = Math.max(nums[0],nums[1])
+4. 遍历方向，从前往后。
+```
+class Solution {
+    public int rob(int[] nums) {
+        if (nums.length == 0) return 0;
+        if (nums.length == 1) return nums[0];
+
+        int[] dp = new int[nums.length];
+
+        dp[0] = nums[0];
+        dp[1] = Math.max(nums[0],nums[1]);
+
+        for (int i = 2; i < nums.length; i++) {
+            dp[i] = Math.max(dp[i-2] + nums[i], dp[i-1]);
+        }
+
+        return dp[nums.length - 1];
+    }
+}
+```
+
+[打家劫舍2(环形)leetcode213](https://leetcode-cn.com/problems/house-robber-ii/)
+![打家劫舍2](./pics/dp/打家劫舍2.png)
+1. 如上图所示，如果成环，包括三种情况。第一种不包含首尾，另外两种只包含首或者尾
+```
+class Solution {
+    public int rob(int[] nums) {
+        if (nums.length == 0) return 0;
+        if (nums.length == 1) return nums[0];
+
+        int res1 = robrange(nums, 0, nums.length - 2); // 看好坐标
+        int res2 = robrange(nums, 1, nums.length - 1);
+        return Math.max(res1,res2);
+
+    }
+    
+    public int robrange(int[] nums, int start, int end) {
+        if (start == end) return nums[start];
+
+        int[] dp = new int[nums.length];
+        dp [start] = nums[start];
+        dp [start + 1] = Math.max(nums[start], nums[start + 1]);
+        
+        for (int i = start+2; i <= end; i++) {   // 从start+2 ——> end
+            dp[i] = Math.max(dp[i-1], dp[i-2] + nums[i]);
+        }
+        return dp[end];
+    }
+}
+```
+
+[打家劫舍3(树形) leetcode337](https://leetcode-cn.com/problems/house-robber-iii/)
+#### 思路
+1. 要不偷左右孩子，要不偷该节点
+2. 因为要知道左右孩子，所以应该使用后序遍历
+3. 树形动态规划
+#### 动规思路
+1. 每个结点都有两种状态，偷或者不偷
+2. 递归函数的参数及返回值 dp为长度为2的数组，下标0为不偷该结点的最大金额；下表1为偷该结点的最大金额。
+3. 终止条件， 当前节点为空
+4. 遍历顺序：
+    - left = rob(curr.left);
+    - right = rob(curr.right);
+5. 单层逻辑：
+    - 偷当前结点，就不能偷孩子： int val1 = curr.val + left[0] + right[0];
+    - 不偷当前结点，偷孩子权衡偷还是不偷：int val2 = Math.max(left[0], left[1]) + Math.max(right[0], right[1]);
+    - return Math.max(val1, val2); 
+
+```
+// 暴力递归+记忆化
+class Solution {
+    Map<TreeNode, Integer> map = new HashMap<>();
+    public int rob(TreeNode root) {
+        if (root == null) return 0;
+
+        // 记忆化,把遍历过的存到map中
+        if (map.containsKey(root)) {
+            return map.get(root);
+        }
+
+        // 取父节点和孙子结点
+        int money = root.val;
+        if (root.left != null) {
+            money += rob(root.left.left) + rob(root.left.right);
+        }
+        if (root.right != null) {
+            money += rob(root.right.left) + rob(root.right.right);
+        }
+
+        // 取儿子结点
+        int money2 = rob(root.left) + rob(root.right);
+        int res = Math.max(money,money2);
+
+        // 存储遍历过的结点，一定是root和res
+        map.put(root, res);
+        return res;
+    }
+}
+```
+```
+public int rob(TreeNode root) {
+        int[] res = dp(root);
+        return Math.max(res[0],res[1]);
+    }
+
+    public int[] dp(TreeNode root) {
+        int[] res = new int[2];
+        if (root == null) {
+            return res;
+        }
+
+        int[] left = dp(root.left);
+        int[] right = dp(root.right);
+        
+        //不选当前，选孩子
+        res[0] = Math.max(left[0],left[1]) + Math.max(right[0],right[1]);
+        // 选当前结点，不选孩子结点
+        res[1] = root.val + left[0] + right[0];
+        return res;
+    }
+```
+### 买股票
+[买卖一支股票](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/)
+- 贪心算法，收益 = price[3] - price[1] = (price[3] - price[2]) + (price[2] - price[1]) 因此只关心每天的增量
+- 动态规划
+1. dp数组：dp[i][0]表示第i天持有股票时的现金总和;  
+           dp[i][1]表示第i天卖出后的现金总和。
+2. 递推公式：**持有并不等于买入，不持有也不等于卖出**
+   1. 第i天持有股票：dp[i][0]取决于第i-1天所持股票和当天是否选择买入  
+   dp[i][0] = Math.max(dp[i-1][0], -prices[i]);
+   1. 第i天不持有股票：dp[j][1]取决于第i-1天卖出还是第i天卖出  
+    dp[i][1] = Math.max(dp[i-1][1], prices[i] + dp[i-1][0]);
+3. 初始化：dp[0][0] = -prices[0]; dp[0][1] = 0;
+4. 遍历顺序，从前往后
+```
+class Solution {
+    public int maxProfit(int[] prices) {
+
+        int n = prices.length;
+        int res = 0;
+        int[][] dp = new int[n][2];
+
+        dp[0][0] = -prices[0];
+        dp[0][1] = 0;
+
+        for (int i = 1; i < n; i++) {
+            // 持有股票后的现金总和，肯定是越大越好
+            dp[i][0] = Math.max(dp[i-1][0], -prices[i]);
+            // 卖出后当前持有的现金总和，也是越大越好
+            dp[i][1] = Math.max(dp[i-1][1], dp[i-1][0] + prices[i]);
+            
+        }
+        return dp[n-1][1];
+    }   
+}
+```
+[买卖多支股票](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/)
+- 贪心算法跟之前一样
+- 动态规划主要体现在递推公式的不同
+   1. dp[i][0]表示第i天持有的股票时存在的现金：  
+   前一天没卖，昨天跟今天的一样 dp[i-1][0];  
+   前一天卖了，今天又买了的持有 dp[i-1][1] - prices[i];
+   2. dp[i][1] 表示第i天卖出股票后的现金：  
+   前一天不持有股票，跟前一天一样。 dp[i-1][0];  
+   前一天持有股票： dp[i-1][0] + prices[i]
+```
+class Solution {
+
+    /*
+    // 贪心
+    public int maxProfit(int[] prices) {
+        if (prices.length == 1) {
+            return 0;
+        }
+        int sum = 0;
+        for (int i = 0; i < prices.length - 1; i++) {
+            int count = prices[i+1] - prices[i];
+            if (count >= 0) {
+                sum += count;
+            }
+        }
+        return sum;
+    }
+    */
+
+    public int maxProfit(int[] prices) {
+        int n = prices.length;
+        int[][] dp = new int[n][2];
+
+        dp[0][0] = -prices[0];
+        dp[0][1] = 0;
+
+        for (int i = 1; i < n; i++) {
+            // 持有时的现金
+            dp[i][0] = Math.max(dp[i-1][0], dp[i-1][1] - prices[i]);
+            // 卖出后的现金
+            dp[i][1] = Math.max(dp[i-1][1], dp[i-1][0] + prices[i]);
+            
+        }
+        return dp[n-1][1];
+    }   
+}
+```
+[最多完成两笔交易股票](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/)
+- 最多完成两次交易，意味着可以买卖一次，买卖两次和不买卖
+- dp数组以及下标  
+  0：不操作  
+  1：第一次买入  
+  2：第一次卖出  
+  3：第二次买入  
+  4：第二次卖出  
+  dp[i][j]表示第i天状态j所持有的最大金额。
+  dp[i][0] = dp[i-1][0];    
+  dp[i][1] = Math.max(dp[i-1][0] - prices[i], dp[i-1][1]);  
+  dp[i][2] = Math.max(dp[i-1][1] + prices[i], dp[i-1][2]);
+  dp[i][3] = Math.max(dp[i-1][2] - prices[i], dp[i-1][3]);
+  dp[i][4] = Math.max(dp[i-1][3] + prices[i], dp[i-1][4]);
+- 初始化  
+  dp[0][0] = 0; dp[1][0] = -prices[0];  dp[0][2] = 0; dp[0][3] = -prices[0]; dp[4][0] = 0;
+- 遍历顺序：从前往后
+```
+class Solution {
+    public int maxProfit(int[] prices) {
+        int n = prices.length;
+        int[][] dp = new int[n][5];
+
+        dp[0][0] = 0;
+        dp[0][1] = -prices[0];
+        dp[0][2] = 0;
+        dp[0][3] = -prices[0];
+        dp[0][4] = 0; 
+
+        for (int i = 1; i < n; i++) {
+            dp[i][0] = dp[i-1][0];    
+            dp[i][1] = Math.max(dp[i-1][0] - prices[i], dp[i-1][1]);  
+            dp[i][2] = Math.max(dp[i-1][1] + prices[i], dp[i-1][2]);
+            dp[i][3] = Math.max(dp[i-1][2] - prices[i], dp[i-1][3]);
+            dp[i][4] = Math.max(dp[i-1][3] + prices[i], dp[i-1][4]);
+        }
+        return dp[n-1][4];
+    }
+}
+```
+[最多完成K次交易的股票](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iv/)  
+- 由上可知，买卖股票具有一定的规律性，除了0，总是在奇数的时候买入，偶数的时候卖出
+- dp[i][j]表示第i天在状态j时持有的最大金额为dp[i][j];
+- 奇数买入，
+
+```
+class Solution {
+    public int maxProfit(int k, int[] prices) {
+        int n = prices.length;
+        int[][] dp = new int[n][2*k + 1];
+
+        if (n == 0) return 0; 
+        // 初始化
+        dp[0][0] = 0;
+        // 奇数初始化为-prices[0]
+        for (int i = 1; i < k*2; i += 2) {
+            dp[0][i] = -prices[0];
+        }
+
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < k*2 - 1; j += 2) {
+                // 奇数买入，等于上一次买入的和上一次卖出这次买入的最大值
+                dp[i][j+1] = Math.max(dp[i-1][j+1],dp[i-1][j] - prices[i]);
+                // 偶数卖出，等于上一次卖出的和上一次没有卖出这次卖出的最大值
+                dp[i][j+2] = Math.max(dp[i-1][j+2], dp[i-1][j+1] + prices[i]);
+            }
+        }
+        return dp[n-1][k*2];
+    }
+}
+```
+
+[买卖股票包含冷冻期](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
+1. dp[i][j] 在第i天第j中状态下所持有的股票金额。
+2. j的四个状态：  
+ 
+买入股票状态一：
+- 前一天就是买入股票状态dp[i][0] = dp[i-1][0];
+- 保持卖出股票状态：  
+  - 操作一：昨天为冷冻期，dp[i][0] = dp[i-1][3] - prices[i];  
+  - 操作二：昨天为卖出股票状态非冷冻期，dp[i][0] = dp[i-1][1] - prices[i];  
+dp[i][0] = Math.max(dp[i-1][0], Math.max(dp[i-1][3], dp[i-1][1]) - prices[i])         
+
+达到保持股票卖出状态二dp[i][1]   
+- 操作一：前一天是状态二： dp[i][1] = dp[i-1][1]
+- 操作二：前一天是冷冻期：dp[i][1] = dp[i-1][3]   
+dp[i][1] = Math.max(dp[i-1][1], dp[i-1][3]);  
+  
+达到今天就卖出股票状态三dp[i][2]  
+
+- 操作一：卖出之前一定是持有股票状态dp[i][0]； 
+dp[i][2] = Math.max(dp[i-1][0] + prices[i])   
+
+达到冷冻期状态：dp[i][3] = dp[i-1][2]
+
+```
+class Solution {
+    public int maxProfit(int[] prices) {
+        int n = prices.length;
+        int[][] dp = new int[n][4];
+
+        dp[0][0] = -prices[0];
+
+        for (int i = 1; i < n; i++) {
+            // 达到买入股票状态
+            dp[i][0] = Math.max(dp[i-1][0],Math.max(dp[i-1][1],dp[i-1][3]) - prices[i]);
+
+            // 达到保持卖出股票状态
+            dp[i][1] = Math.max(dp[i-1][1], dp[i-1][3]);
+
+            // 今天卖出股票
+            dp[i][2] = dp[i-1][0] + prices[i]; 
+
+            // 冷冻期
+            dp[i][3] = dp[i-1][2];
+        }
+        return Math.max(dp[n-1][3], Math.max(dp[n-1][1], dp[n-1][2]));
+    }
+}
+```
