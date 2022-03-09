@@ -664,7 +664,8 @@ class Solution {
 }
 ```
 
-[打家劫舍2(环形)leetcode213](https://leetcode-cn.com/problems/house-robber-ii/)
+[打家劫舍2(环形)leetcode213](https://leetcode-cn.com/problems/house-robber-ii/)  
+
 ![打家劫舍2](./pics/dp/打家劫舍2.png)
 1. 如上图所示，如果成环，包括三种情况。第一种不包含首尾，另外两种只包含首或者尾
 ```
@@ -775,7 +776,7 @@ public int rob(TreeNode root) {
    dp[i][0] = Math.max(dp[i-1][0], -prices[i]);
    1. 第i天不持有股票：dp[j][1]取决于第i-1天卖出还是第i天卖出  
     dp[i][1] = Math.max(dp[i-1][1], prices[i] + dp[i-1][0]);
-3. 初始化：dp[0][0] = -prices[0]; dp[0][1] = 0;
+3. 初始化：dp[0][0] = -prices[0]; (**第0天如果持有股票，就是当天买入的**)dp[0][1] = 0;（**当天不可能卖出股票**）
 4. 遍历顺序，从前往后
 ```
 class Solution {
@@ -963,6 +964,143 @@ class Solution {
             dp[i][3] = dp[i-1][2];
         }
         return Math.max(dp[n-1][3], Math.max(dp[n-1][1], dp[n-1][2]));
+    }
+}
+```
+
+## 子序列问题
+[最长连续递增序列leetcode674](https://leetcode-cn.com/problems/longest-continuous-increasing-subsequence/)
+```
+class Solution {
+    /*
+    // 常规解法
+    public int findLengthOfLCIS(int[] nums) {
+       int res = 1;
+       int n = nums.length;
+       int d = 1;
+        for (int i = 1; i < n; i++) {
+            int temp = nums[i] - nums[i-1];
+            if (temp > 0) {
+                d++;
+            } else {
+                d = 1;
+            }
+            if (res < d) {
+                res = d;
+            }
+        }
+        return res;
+    }
+    */
+
+    // 动态规划
+    public int findLengthOfLCIS(int[] nums) {
+        int res = 1;
+        int[] dp = new int[nums.length];
+        for (int i = 0; i < nums.length; i++) {
+            dp[i] = 1;
+        }
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] - nums[i-1] > 0) {
+                dp[i] = dp[i-1] + 1;
+            }
+            if (dp[i] > res) {
+                res = dp[i];
+            }
+        }
+        return res;
+    }
+}
+```
+
+[最长递增子序列](https://leetcode-cn.com/problems/longest-increasing-subsequence/)  
+- dp[]: dp[i]表示i之前的最长上升子序列的长度为dp[i]
+- 转移方程：位置i的最长上升子序列等于j从0到i-1各个位置的最长上升子序列+1的最大值  
+   if (nums[i] > nums[j]) dp[i] = max(dp[i], dp[j] + 1);     
+**注意这里不是要dp[i] 与 dp[j] + 1进行比较，而是我们要取dp[j] + 1的最大值。**
+```
+class Solution {
+    public int lengthOfLIS(int[] nums) {
+        int n = nums.length;
+        int res = 1;
+        int[] dp = new int[n];
+        for (int i = 0; i < n; i++) {
+            dp[i] = 1;
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) {
+                    dp[i] = Math.max(dp[i],dp[j]+1);
+                }
+            }
+            if (dp[i] > res) {
+                res = dp[i];
+            }
+        }
+        return res;
+    }
+}
+```
+
+[最长重复子数组leetcode718](https://leetcode-cn.com/problems/maximum-length-of-repeated-subarray/)  
+- dp数组：dp[i][j]表示以下标i-1为结尾的A，和以下标j-1为结尾的B，最长重复的子数组长度为dp[i][j];
+- dp[i][j]的状态取决于dp[i-1][j-1]的状态，即当A[i-1] == B[j-1]时，dp[i][j] = dp[i-1][j-1] + 1;
+- 初始化：dp[0][j]和dp[i][0]表示以-1结尾，所以没有意义。为了递推公式，dp[0][j]和dp[i][0]初始化为0；即当A[0] == B[0]时，dp[1][1] = dp[0][0] + 1;  
+- 遍历方向：从前往后，内层A;外层B.
+```
+class Solution {
+    public int findLength(int[] nums1, int[] nums2) {
+        int n1 = nums1.length;
+        int n2 = nums2.length;
+        int res = 0;
+        int[][] dp = new int[n1 + 1][n2 + 1];
+
+        for (int i = 1; i < n1 + 1; i++) {  //涉及到nums[i-1]
+            for (int j = 1; j < n2 + 1; j++) {
+                if (nums1[i-1] == nums2[j-1]) {
+                    dp[i][j] = dp[i-1][j-1] + 1;
+                    res = Math.max(res, dp[i][j]);
+                }
+            }
+        }
+        return res;
+    }
+}
+```
+
+[最长公共子序列leetcode1143](https://leetcode-cn.com/problems/longest-common-subsequence/)    
+
+![最长公共子序列](./pics/dp/%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%AD%90%E5%BA%8F%E5%88%97.jfif)
+- dp数组 dp[i][j]代表以下标i-1为结尾的A,和以下标j-1为结尾的B，最长的重复子串大小为dp[i][j]
+- 递推公式：dp[i][j]的状态取决于dp[i-1][j-1]的状态，一共有两种情况：
+  1. 当A[i-1] == B[j-1]时，dp[i][j] = dp[i-1][i-1] + 1; （两个序列最后一位相等，公共序列加1）
+  2. 当A[i-1] != B[j-1]时，dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+- 初始化：dp[0][0]没意义，为了推导方便
+- 遍历方向，从左到右，先A后B
+```
+class Solution {
+    public int longestCommonSubsequence(String text1, String text2) {
+        
+        int res = 0;
+
+        char[] t1 = text1.toCharArray();
+        char[] t2 = text2.toCharArray();
+        int n1 = t1.length;
+        int n2 = t2.length;
+
+        int[][] dp = new int[n1 + 1][n2 + 1];
+        for (int i = 1; i < n1 + 1; i++) {
+            for (int j = 1; j < n2 + 1; j++) {
+                if (t1[i-1] == t2[j-1]) {  //最后一位相等
+                    dp[i][j] = dp[i-1][j-1] + 1;
+                } else {  // 最后一位不等
+                    dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+                }
+                res = Math.max(res, dp[i][j]);
+            }
+        }
+        return res;
     }
 }
 ```
