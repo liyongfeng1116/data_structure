@@ -1104,3 +1104,367 @@ class Solution {
     }
 }
 ```
+
+[不相交的线leetcode1035](https://leetcode-cn.com/problems/uncrossed-lines/)
+  
+- 直线不相交，只要相对顺序不变，直线就不会交叉，因此就是求最长公共子序列
+- dp[i][j] 表示A[0:i-1]的序列和B[0:j-1]的序列的最长不相交的直线的数量。
+- dp[i][j]取决于dp[i-1][j-1],分两种情况：
+  1. A[i-1] == B[j-1]:说明可以增加一条线 dp[i][j] = dp[i-1][j-1] + 1;
+  2. A[i-1] != B[j-1]:不能增加线, dp[i][j] = Math.max(dp[i-1][j],dp[i][j-1]);
+- 初始化，dp[0][0] = 0;
+- 遍历方向：从前往后，先A后B
+```
+class Solution {
+    public int maxUncrossedLines(int[] nums1, int[] nums2) {
+        int n1 = nums1.length;
+        int n2 = nums2.length;
+
+        int res = 0;
+
+        int[][] dp = new int[n1 + 1][n2 + 1];
+
+        for (int i = 1; i <= n1; i++) {
+            for (int j = 1; j <= n2; j++) {
+                if (nums1[i-1] == nums2[j-1]) {
+                    dp[i][j] = dp[i-1][j-1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+                }
+
+                res = Math.max(res, dp[i][j]);
+
+            }
+        }
+        return res;
+    }
+}
+```  
+
+[最大子数组和leetcode52](https://leetcode-cn.com/problems/maximum-subarray/)
+- 贪心法：（**很妙**）
+```
+class Solution {
+    // 贪心
+    public int maxSubArray(int[] nums) {
+        int res = Integer.MIN_VALUE;
+        int count = 0; 
+
+       for (int i = 0; i < nums.length; i++) {
+           count += nums[i];
+           res = Math.max(res, count);  // res始终保存最大值
+        //    System.out.print(res);
+        //    System.out.println(count);
+           if (count <= 0) { 
+               count = 0;
+           }
+       }
+       return res;
+    }
+}
+```
+- 动态规划
+1. dp[i]表示包括i之前的最大连续子序列的和为dp[i]
+2. 递推公式：dp[i]与dp[i-1]相关。
+   1. 当前的加入： dp[i] = dp[i-1] + nums[i];
+   2. 重新开始; dp[i] = nums[i];
+3. 初始化：dp[0] = nums[0];
+4. 从前往后
+```
+public int maxSubArray (int[] nums) {
+        if (nums.length == 1) {
+            return nums[0];
+        }
+        int res = nums[0];
+        int[] dp = new int[nums.length];
+        dp[0] = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            dp[i] = Math.max(dp[i-1] + nums[i], nums[i]);
+            res = Math.max(dp[i],res);
+        }
+        return res;     
+    }
+```
+
+[判断子序列leetcode329](https://leetcode-cn.com/problems/is-subsequence/)
+```
+// 双指针
+class Solution {
+    public boolean isSubsequence(String s, String t) {
+        char[] sc = s.toCharArray();
+        char[] tc = t.toCharArray();
+
+        int i = 0;
+        int j = 0;
+        while (i < sc.length && j < tc.length) {
+            if (sc[i] == tc[j]) {
+               i++;
+               j++;
+           } else {
+               j++;
+           }
+           System.out.print(i);
+           System.out.print(j);
+           System.out.println("*");
+        }
+        
+        if (i == sc.length) {
+            return true;
+        }else {
+            return false;
+        }
+            
+
+    }
+}
+```
+- 动态规划
+1. dp[i][j] 表示以下标i-1结尾的字符串s，和以下标j-1结尾的字符串t，相同子序列的长度为dp[i][j];
+2. 递推公式：
+   1. 如果两个数字相等，if s[i-1] == t[j-1]: dp[i][j] =  dp[i-1][j-1] + 1;
+   2. 如果两个数字不相等， dp[i][j] = dp[i][j-1];
+3. 初始化：dp[0][0] = 0; 
+4. 遍历方向，从前往后,从1开始
+```
+class Solution {
+    public boolean isSubsequence(String s, String t) {
+        char[] sc = s.toCharArray();
+        char[] tc = t.toCharArray();
+        int slen = sc.length;
+        int tlen = tc.length;
+
+        int[][] dp = new int[slen+1][tlen+1];
+        dp[0][0] = 0;
+        for (int i = 1; i <= slen; i++) {
+            for (int j = 1; j <= tlen; j++) {
+                if (sc[i-1] == tc[j-1]) {
+                    dp[i][j] = dp[i-1][j-1] + 1;
+                } else {
+                    dp[i][j] = dp[i][j-1]; // 不是dp[i-1][j-1]
+                }
+            }
+        }
+        return dp[slen][tlen] == slen;
+    }
+}
+```
+[不同的子序列leetcode115](https://leetcode-cn.com/problems/distinct-subsequences/)
+1. dp[i][j] 表示以i-1结尾的s的子序列中出现j-1结尾t的子序列的个数。
+2. 状态转移方程：
+   1. 如果s[i-1] == t[j-1]: dp[i][j]  = dp[i-1][j-1] + dp[i-1][j];
+   2. 如果s[i-1] != t[j-1]: dp[i][j] = dp[i-1][j];
+3. 初始化：dp[0][0] = 0;
+
+```
+class Solution {
+    public int numDistinct(String s, String t) {
+        char[] sc = s.toCharArray();
+        char[] tc = t.toCharArray();
+
+        int slen = sc.length;
+        int tlen = tc.length;
+
+        int[][] dp = new int [slen+1][tlen+1];
+        dp[0][0] = 1;
+        for (int i = 0; i <= slen; i++) {
+            dp[i][0] = 1;
+        }
+
+        for (int i = 1; i <= slen; i++) {
+            for (int j = 1; j <= tlen; j++) {
+                if (sc[i-1] == tc[j-1]) {
+                    dp[i][j] = dp[i-1][j-1] + dp[i-1][j];
+                }else {
+                    dp[i][j] = dp[i-1][j];
+                }
+            }
+        }
+
+        return dp[slen][tlen];
+    }
+}
+```
+
+[两个字符串的删除操作leetcode583](https://leetcode-cn.com/problems/delete-operation-for-two-strings/)
+1. word1以i-1结尾的子序列和word2以j-1结尾的子序列要相等需要删除的个数。
+2. 递推公式： 
+   1. 如果两个相等则不需要删除
+   2. 如果两个不等：这三者取最小（1）两个都删除，因此+2；（2）删除i，+1；（3）删除j，+1。
+3. 初始化：如果j为0，i就必须删除i位，dp[i][0] = i;j 同理
+4. 遍历方向：从1开始，从前往后
+```
+class Solution {
+    public int minDistance(String word1, String word2) {
+        char[] w1 = word1.toCharArray();
+        char[] w2 = word2.toCharArray();
+
+        int len1 = w1.length;
+        int len2 = w2.length;
+
+        int[][] dp = new int [len1+1][len2+1];
+
+        for (int i = 0; i < len1 + 1; i++) {
+            dp[i][0] = i;
+        }
+        for (int j = 0; j < len2 + 1; j++) {
+            dp[0][j] = j;
+        }
+
+        for (int i = 1; i <= len1; i++) {
+            for (int j = 1; j <= len2; j++) {
+                if (w1[i-1] == w2[j-1]) {
+                    dp[i][j] = dp[i-1][j-1];
+                }else {
+                    dp[i][j] = Math.min(dp[i-1][j-1] + 2, Math.min(dp[i][j-1],dp[i-1][j]) + 1);
+                }
+            }
+        }
+
+        return dp[len1][len2];
+    }
+}
+```
+
+[编辑距离]()
+- 相等
+- 不等
+```
+class Solution {
+    public int minDistance(String word1, String word2) {
+        char[] w1 = word1.toCharArray();
+        char[] w2 = word2.toCharArray();
+
+        int len1 = w1.length;
+        int len2 = w2.length;
+
+        int[][] dp = new int[len1 + 1][len2 + 1];
+
+        for (int i = 0; i < len1+1; i++) {
+            dp[i][0] = i;
+        }
+        for (int j = 0; j < len2+1; j++) {
+            dp[0][j] = j;
+        }
+
+        for (int i = 1; i < len1+1; i++) {
+            for (int j = 1; j < len2+1; j++) {
+                if (w1[i-1] == w2[j-1]) {
+                    dp[i][j] = dp[i-1][j-1];
+                } else {
+                    dp[i][j] = Math.min(dp[i-1][j-1], Math.min(dp[i-1][j],dp[i][j-1])) + 1;
+                }
+            } 
+        }
+
+        return dp[len1][len2];
+    }
+}
+```
+[回文子串](https://leetcode-cn.com/problems/palindromic-substrings/)
+- 动态规划
+1. dp[i][j]表示区间范围[i,j]之间的子串是不是回文串，如果是，返回true，不是返回false。
+2. 递推公式：
+   1. 如果s[i] != s[j]: dp[i][j] = false;
+   2. 如果等于：(1) i和j相同，同一个字符；(2) i和j相差1，aa也是true，(3)相差大于1，看dp[i+1][j-1]是否是true
+   if (s[i] == s[j]) {
+       if (j - i <= 1) {
+           result++;
+           dp[i][j] = true;
+       }else if(dp[i+1][j-1]) {
+           result++;
+           dp[i][j] = true;
+       }
+   }
+初始化：全为false;
+遍历方向：两头到中间,因为在看dp[i][j]的时候首先要看dp[i+1][j-1],所以遍历方向是i从后往前，j从前往后。
+```
+class Solution {
+    public int countSubstrings(String s) {
+        char[] sc = s.toCharArray();
+        int len = sc.length;
+
+        int res = 0;
+        boolean[][] dp = new boolean[len][len];
+
+        for (int i = len-1; i >= 0; i--) {
+            for (int j = i; j < len; j++) {
+                if(sc[i] == sc[j]) {
+                    if (j-i <= 1) { // 只有两位最多，只要相等，必须是回文
+                        res++;
+                        dp[i][j] = true;
+                    }else if (dp[i+1][j-1]) {  // 前一个为回文，当前两个值相等
+                        res++;  
+                        dp[i][j] = true; // 可以从i+1>>>i; j-1>>>j
+                    }      
+                }
+                
+            }
+        }
+        return res;
+    }
+}
+```
+- 双指针法
+1. 找中心点，从中心点开始对比i和j的值，往外扩散
+2. 中心点可以有一个，也可以是两个
+```
+// 双指针法
+    public int countSubstrings(String s) {
+        int res = 0;
+        int size = s.length();
+        for (int i = 0; i < size; i++) {
+            res += extend(s, i, i, size);   // 一个中心点
+            res += extend(s, i, i+1, size); // 两个中心点
+        }
+        return res;
+    }
+
+    public int extend(String s, int i, int j, int size) {
+
+        int res = 0;
+
+        while (i >= 0 && j < size && s.charAt(i) == s.charAt(j)) { // 扩散方法
+            i--;
+            j++;
+            res++;
+        }
+
+        return res;
+    }
+```
+[最长回文子序列leetcode516](https://leetcode-cn.com/problems/longest-palindromic-subsequence/)
+1. dp[i][j]表示从[i,j]之间的最大回文子序列的长度为dp[i][j]
+2. 动态转移方程：
+   1. s[i] == s[j]: dp[i][j] = dp[i+1][j-1] + 2; 
+   2. s[i] != s[j]: dp[i][j] = Math.max(dp[i+1][j], dp[i][j-1]);
+3. 初始化：当i和j相等的时候，dp[i][i] = 1;
+4. **遍历方向：i从后往前因为需要dp[i+1]，j从前往后，因为需要dp[j-1]**
+```
+class Solution {
+    public int longestPalindromeSubseq(String s) {
+        char[] sc = s.toCharArray();
+        int n = sc.length;
+        
+        int res = 0;
+
+        int[][] dp = new int[n][n];
+
+        // 初始化
+        for (int i = 0; i < n; i++) {
+            dp[i][i] = 1;
+        }
+
+        for (int i = n-1; i >= 0; i--) {
+            for (int j = i+1; j < n; j++) {
+                if (sc[i] == sc[j]) {
+                    dp[i][j] = dp[i+1][j-1] + 2;
+                } else {
+                    dp[i][j] = Math.max(dp[i+1][j],dp[i][j-1]);
+                }
+            }
+        }
+        return dp[0][n-1];
+    }
+}
+```
+   
