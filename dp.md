@@ -22,7 +22,7 @@ class Solution {
         for (int i = 2; i <= n; i++) {
             // 递推关系
             dp[i] = dp[i-2] + dp[i-1];
-        }
+        }..
         return dp[n];
     }
 }
@@ -1467,4 +1467,4 @@ class Solution {
     }
 }
 ```
-   
+![动态规划总结](./pics/dp/%E5%8A%A8%E8%A7%84%E6%80%BB%E7%BB%93.png)
