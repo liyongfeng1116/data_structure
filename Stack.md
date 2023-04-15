@@ -74,27 +74,33 @@ class Solution {
 ```
 ## 处理环形数组
 有些问题需要处理环形数组，这种数组头尾相接。一般通过**求模运算**来做。
-nums = [2,0,6,1,3] 的环形数组就是将其拉伸为[2,0,6,1,3,2,0,6,1] 数组长度为5，则最后一个元素的下标为8 % 5 = 3 
+nums = [2,1,2,4,3] 的环形数组就是将其拉伸为[2,1,2,4,3,2,1,2,4,3]， 数组长度为5，则下一轮第一个元素下标就是index % 5 = 5 % 5 = 0  
+
+![循环数组](./pics/nowcode/%E5%BE%AA%E7%8E%AF%E6%95%B0%E7%BB%84.png) 
+因此只需要将数组长度扩充为 2 * n - 1，i 变成 i % n 即可
+![循环数组2](./pics/nowcode/%E7%8E%AF%E5%BD%A2%E6%95%B0%E7%BB%842.png) 
 ## 重点题型
 ### 单调栈
 - 单调栈内的元素都是递增或者递减的
 - 一般用来处理**下一个更大的问题**
 - 从后往前扫描，
+
+![单调栈](./pics/nowcode/%E5%8D%95%E8%B0%83%E6%A0%88.png) 
 ```
 **************************单调栈模板**************************
 int n = nums.length;
 int [] res = new int[n];
 Deque<Integer> stack = new LinkedList<Integer>();
-for (int i = n - 1; i >= 0; i--) {
-    while (!stack.isEmpty() && stack.peek() <= nums[i]) {
+for (int i = n - 1; i >= 0; i--) {  // 从后往前扫描
+    while (!stack.isEmpty() && stack.peek() <= nums[i]) {   // 不为空时，把比要进去的小的元素pop，因为被个子大的挡住了
         stack.pop();
     }
-    if (stack.isEmpty()) {
+    if (stack.isEmpty()) {  // 为空意味着没有比他大的
         res[i] = -1;
     } else {
-        res[i] = stack.peek();
+        res[i] = stack.peek(); // 不为空，第一个元素就是最大的
     }
-    stack.push(nums[i]);
+    stack.push(nums[i]);  //进栈接受之后的比较
 }
 ```
 1. 下一个更大元素（[leetcode 496](https://leetcode-cn.com/problems/next-greater-element-i/)） 相似的题（[leetcode 503](https://leetcode-cn.com/problems/next-greater-element-i/)）

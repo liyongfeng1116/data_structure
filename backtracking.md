@@ -93,7 +93,7 @@ class Solution {
     List<String> res = new ArrayList<>();
     StringBuilder temp = new StringBuilder(); // 注意字符串
     String [] numString = {"","","abc","def","ghi","jkl","mno","pqrs","tuv","wxyz"};
-    void backtracking (String digits, int index) { //控制的纵向的递归。index为书的深度也是遍历字母的个数 
+    void backtracking (String digits, int index) { //控制的纵向的递归。index为输入的深度也是遍历字母的个数 
         if (index == digits.length()) {
             res.add(temp.toString());
             return;

@@ -182,7 +182,7 @@ class MyStack {
         queue1 = new LinkedList<Integer>();
         queue2 = new LinkedList<Integer>();
     }
-    
+    //始终保持queue2为空，每次装栈顶元素，然后把queue1中的元素挨个出队，放到queue2中，此时1为空，并交换1和2
     public void push(int x) {
         // queue2加入新的元素,在队头
         queue2.offer(x);

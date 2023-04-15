@@ -157,7 +157,8 @@ public class Solution {
 7. 两个链表相交（[leetcode160](https://leetcode-cn.com/problems/intersection-of-two-linked-lists/)）
 - 两个链表长度不同，但长度和是相同的。
 - 为了同时遍历到相交点，遍历完一个链表让其进入第二个，则同时到达交点
-- **反向遍历，直到最后一个不一样的值出现**
+- **反向遍历，直到最后一个不一样的值出现**     
+
 ![链表相交](https://labuladong.gitee.io/algo/images/%e9%93%be%e8%a1%a8%e6%8a%80%e5%b7%a7/6.jpeg "链表相交")    
 ```
 public class Solution {
@@ -186,7 +187,7 @@ public class Solution {
     }
 }
 ```
-8. 反转链表 （[leetcode206](https://leetcode-cn.com/problems/reverse-linked-list/)） 相似题目 [leetcode92](https://leetcode-cn.com/problems/reverse-linked-list-ii/)
+1. 反转链表 （[leetcode206](https://leetcode-cn.com/problems/reverse-linked-list/)） 相似题目 [leetcode92](https://leetcode-cn.com/problems/reverse-linked-list-ii/)
 - 遍历将每个节点指向前一个节点
 - 第一个节点指向null
 - 注意**缓存当前节点的下一个**，因为需要将当前节点的下一个指向前前一个节点  

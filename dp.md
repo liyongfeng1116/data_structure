@@ -783,7 +783,6 @@ class Solution {
     public int maxProfit(int[] prices) {
 
         int n = prices.length;
-        int res = 0;
         int[][] dp = new int[n][2];
 
         dp[0][0] = -prices[0];
@@ -969,7 +968,7 @@ class Solution {
 ```
 
 ## 子序列问题
-[最长连续递增序列leetcode674](https://leetcode-cn.com/problems/longest-continuous-increasing-subsequence/)
+- [最长连续递增序列leetcode674](https://leetcode-cn.com/problems/longest-continuous-increasing-subsequence/)
 ```
 class Solution {
     /*
@@ -1013,7 +1012,7 @@ class Solution {
 }
 ```
 
-[最长递增子序列](https://leetcode-cn.com/problems/longest-increasing-subsequence/)  
+  [最长递增子序列](https://leetcode-cn.com/problems/longest-increasing-subsequence/)  
 - dp[]: dp[i]表示i之前的最长上升子序列的长度为dp[i]
 - 转移方程：位置i的最长上升子序列等于j从0到i-1各个位置的最长上升子序列+1的最大值  
    if (nums[i] > nums[j]) dp[i] = max(dp[i], dp[j] + 1);     

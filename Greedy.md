@@ -24,6 +24,34 @@
         }
     }
     ```
+
+    ```
+class Solution {
+    public int findContentChildren(int[] g, int[] s) {
+        Arrays.sort(g);
+        Arrays.sort(s);
+        
+        int res = 0;
+        int cookie = 0;
+        int child = 0;
+        while (child < g.length && cookie < s.length) {
+            // if (s[cookie] >= g[child]) {
+            //     res++;
+            //     child++;
+            //     cookie++;
+            // } else {
+            //     cookie++;
+            // }
+            if (s[cookie] >= g[child]) {
+                res++;
+                child++;     
+            } 
+            cookie++; 
+        }
+        return res;
+    }
+}
+    ```
 - [摆动序列leetcode376](https://leetcode-cn.com/problems/wiggle-subsequence/)
     
       1. 只找到波峰和波谷的值
@@ -41,9 +69,9 @@
             int prediff = 0;    // 前一对差值
             int currdiff = 0;   // 当前差值
             int res = 1;        // 默认序列右边有一个峰值
-            for (int i = 0; i < nums.length - 1; i++) {
+            for (int i = 0; i < nums.length - 1; i++) {  // 也可以从i=1开始遍历
                 currdiff = nums[i+1] - nums[i];
-                if ((currdiff > 0 && prediff <= 0) || (currdiff < 0 && prediff >= 0)) {
+                if ((currdiff > 0 && prediff <= 0) || (currdiff < 0 && prediff >= 0)) {  // 为什么把=放在prediff
                     res++;
                     prediff = currdiff;
                 }
@@ -112,7 +140,7 @@
             int sum = 0;
             for (int i = 0; i < prices.length - 1; i++) {
                 int count = prices[i+1] - prices[i];
-                if (count >= 0) {
+                if (count >= 0) {  // >0和>=0都可以通过
                     sum += count;
                 }
             }
@@ -155,17 +183,30 @@
     ```
     class Solution {
         public int jump(int[] nums) {
-            int curr_max_far_index = 0;
-            int step = 0;
-            int next_index = 0;
-            for (int i = 0; i < nums.length - 1; i++) {
-                next_index = Math.max(next_index, nums[i] + i);
-                if (i == curr_max_far_index) {
-                    curr_max_far_index = next_index;
-                    step++;
+            if (nums == null || nums.length < 2) return 0;
+            // 跳跃的次数
+            int count = 0;
+
+            // 当前覆盖的最大区域
+            int curDistance = 0;
+
+            // 最大覆盖区域
+            int maxDistance = 0;
+            for (int i = 0; i < nums.length; i++) {
+                // 在可覆盖区域内更新的最大覆盖区域
+                maxDistance = Math.max(maxDistance, i + nums[i]);
+                // 当前可达末尾，再加一步
+                if (maxDistance >= nums.length - 1) {
+                    count++;
+                    break;
+                }
+                // 走到了当前最大覆盖区域时，更新下一步可达的最大区域
+                if (i == curDistance) {
+                    curDistance = maxDistance;
+                    count++;
                 }
             }
-            return step;
+            return count;
         }
     }
     ```
@@ -178,28 +219,30 @@
     ```
     class Solution {
         public int largestSumAfterKNegations(int[] nums, int k) {
-            if (nums.length == 1) {
-                if (k % 2 == 0) {
-                    return nums[0];
-                } else {
-                    return -nums[0];
-                }
+            int n = nums.length;
+
+            if (n == 1) {
+                if (k % 2 == 0) return nums[0];
+                else return -nums[0];
             }
+
             Arrays.sort(nums);
             int sum = 0;
             int idx = 0;
-            for (int i = 0; i < k; i++) {  // 循环K次
-                if (i < nums.length - 1 && nums[idx] < 0) { // 负数的时候
+            for (int i = 0; i < k; i++) {  // i只是循环次数
+                if (i < n-1 && nums[idx] < 0) {
                     nums[idx] = -nums[idx];
-                    if (nums[idx] >= Math.abs(nums[idx+1])) { // 因为nums[idx]已经为正，所以判断下一个是否为负
+                    // 临界点是负数最右边和正数最左边进行比较
+                    if (nums[idx] >= Math.abs(nums[idx+1])) { //保证idx跳到正数最小
                         idx++;
                     }
                     continue;
                 }
-                // 剩下的都是正数，反复反转最小的即可
+                // 如果边界为 -1,3 idx在-1上，如果为-3,1 idx在1上，反正都是最小
                 nums[idx] = -nums[idx];
             }
-            for (int i = 0; i < nums.length; i++) {
+
+            for (int i = 0; i < n; i++) {
                 sum += nums[i];
             }
             return sum;
@@ -304,22 +347,25 @@ class Solution {
         for (int i = 0; i < bills.length; i++) {
             if (bills[i] == 5) {
                 five++;
-            } 
+            }
             if (bills[i] == 10) {
-                if (five <= 0) {
-                    return false;
-                } else {
-                    five--;
+                if (five > 0) {
                     ten++;
-                }            
+                    five--;
+                } else {
+                    return false;
+                }
+                
             }
             if (bills[i] == 20) {
-                if (ten > 0 && five > 0) {
+                if (ten > 0 && five > 0) {  //先找整的，再找零的，所以不能先找5块
                     ten--;
                     five--;
                 } else if (five >= 3) {
                     five = five - 3;
-                } else return false;              
+                } else {
+                    return false;
+                }
             }
         }
         return true;
@@ -383,7 +429,7 @@ class Solution {
         for (int i = 1; i < intervals.length; i++) {
             if (pre > intervals[i][0]) {
                 remove++;
-                pre = Math.min(pre,intervals[i][1]);
+                pre = Math.min(pre,intervals[i][1]);  // 最小的有助于分开区间
             } else {
                 pre = intervals[i][1];
             }
@@ -396,20 +442,20 @@ class Solution {
 ```
 class Solution {
     public List<Integer> partitionLabels(String s) {
-        int[] edge = new int[26];
+        int[] lastindex = new int[26];
         char[] chars = s.toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            edge[chars[i] - 'a'] = i;
+        for (int i = 0; i < s.length(); i++) {  //用数组记录每个字符最远的位置
+            lastindex[chars[i] - 'a'] = i;
         }
 
         List<Integer> res = new LinkedList<>();
-        int last = -1;
-        int idx = 0;
+        int start = -1;
+        int index = 0;
         for (int i = 0; i < chars.length; i++) {
-            idx = Math.max(idx,edge[chars[i] - 'a']);
-            if (i == idx) {
-                res.add(i - last);
-                last = i;
+            index = Math.max(index, lastindex[chars[i] - 'a']);
+            if (i == index) {       // 直到遍历的i与最远的i相等，更新新的起点和加入结果
+                res.add(i-start);
+                start = i;
             }
         }
         return res;

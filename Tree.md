@@ -37,7 +37,8 @@
 - 倒数第二层如存在叶子结点，一定在右边连续位置
 - 如果结点度为1，则该结点的孩子结点一定是左孩子
 - 同样结点数目的二叉树，完全二叉树深度最小
-- **满二叉树一定是完全二叉树，反之不一定**
+- **满二叉树一定是完全二叉树，反之不一定**   
+- **判断完全二叉树，利用层序遍历，有结点为空，记为true，当下次再次出现空，则不是完全二叉树**
 ## 树的关键题目
 ### *一.二叉树的前中后序遍历（深度优先搜索）*  
 1. 前序位置代码在刚进入一个二叉树结点的时候执行； 
@@ -473,7 +474,7 @@ public int diameterOfBinaryTree(TreeNode root) {
 }
 // 该节点经过结点数的最大值
 public int depth(TreeNode root) {
-    if (root != null) {
+    if (root == null) {
         return 0;
     }
     int L = depth(root.left);
@@ -816,7 +817,7 @@ class Solution {
     }
 }
 ```
-- [二叉搜索树的两树之和leetcode653](https://leetcode-cn.com/problems/two-sum-iv-input-is-a-bst/)   
+- [二叉搜索树的两数之和leetcode653](https://leetcode-cn.com/problems/two-sum-iv-input-is-a-bst/)   
     1. 深度或者广度优先遍历，找到k-root.val,如果在set中返回true，不在返回false
 ```
 class Solution {
@@ -884,22 +885,18 @@ class Solution {
     2. 所以当两个都大于根节点，必在右子树
 ```
 class Solution {
-    public boolean findTarget(TreeNode root, int k) {
-        Set<Integer> set = new HashSet<>();
-        return find(root, k, set);
-    }
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null) return null;
 
-    public boolean find(TreeNode root, int k, Set<Integer> set) {
-        if (root == null) {
-            return false;
-        }
-        if (set.contains(k - root.val)) {
-            return true;
-        }else{
-            set.add(root.val);
-        }
+        if (root == p || root == q) return root;
 
-        return find(root.left, k, set) || find(root.right, k, set);
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+        
+        if (p.val < root.val && q.val < root.val) return left;
+        if (p.val > root.val && q.val > root.val) return right;
+
+        return root;
     }
 }
 ```
@@ -940,12 +937,14 @@ class Solution {
         pre.right = head;
         return head;
     }
-    // 深度优先遍历
+    // 深度优先遍历，中序遍历
     public void dfs(Node cur) {
         if (cur == null) {
             return;
         }
+        // 左
         dfs(cur.left);
+
         // pre当为空时，为头节点
         if (pre == null) {
             head = cur;
@@ -956,7 +955,8 @@ class Solution {
         cur.left = pre;
         // pre指向当前cur
         pre = cur;
-
+        
+        // 右
         dfs(cur.right);
     }
 }
@@ -1126,7 +1126,91 @@ class Solution {
 
 }
 ```
+- 完全二叉树
+```
+public boolean isCompleteTree (TreeNode root) {
+        // write code here
+        
+        // 层次遍历
+        // 叶子结点仅出现在最下层和次下层，出现空标记，再次出现空，则说明不是
+        if (root == null) {
+            return true;
+        }
+        
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        boolean flag = false;
+        while (!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            if (node == null) {
+                flag = true;
+                continue;
+            }
+            if (flag) {
+                return false;
+            }
+            // 不需要判断
+            queue.add(node.left);
+            queue.add(node.right);
+        }
+        return true;
+    }
+```
 
+- 树左下角的值
+  层序遍历，从右往左
+```
+class Solution {
+    public int findBottomLeftValue(TreeNode root) {
+        
+        int res = 0;
+        Deque<TreeNode> queue = new LinkedList<>();
+
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            TreeNode node = queue.poll();
+            if (node.right != null) {  // 先右后左
+                queue.add(node.right);
+            }
+            if (node.left != null) {
+                queue.add(node.left);
+            }
+            res = node.val;
+        }
+        return res;
+    }
+}
+```
+- 有序链表转换为二叉树
+  找中点，中点为根，左右递归
+```
+class Solution {
+    public TreeNode sortedListToBST(ListNode head) {
+        return buildTree(head, null);
+    }
+
+    // 找链表中点
+    public ListNode getMedian (ListNode left, ListNode right) {
+        
+        ListNode fast = left, slow = left;
+        while (fast != right && fast.next != right) { // 快的到空，slow到中点
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
+
+    public TreeNode buildTree(ListNode left, ListNode right) {
+        if (left == right) return null;
+
+        ListNode mid = getMedian(left, right); 
+        TreeNode root = new TreeNode(mid.val);
+        root.left = buildTree(left, mid);
+        root.right = buildTree(mid.next, right);
+        return root;
+    }
+}
+```
 
 
 
